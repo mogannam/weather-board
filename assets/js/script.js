@@ -21,7 +21,7 @@ var func_searchCity = (argStr_cityName)=>{
   div_cityBoard.children().remove() 
   
   
-  var apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?q=${argStr_cityName}&appid=${apiKey}`
+  var apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${argStr_cityName}&appid=${apiKey}`
   if(bool_dbg) console.log(apiUrl)
   var apiData = fetch(apiUrl) //make api call
   .then(function(response) {
