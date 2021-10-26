@@ -2,17 +2,77 @@ var bool_dbg =true
 var dictStr_cityList = {}
 var str_liCityCSS = "li-city"
 var div_cityBoard = $(".city-board")
+var div_weatherBoard = $(".weather-forecast-board")
+var obj_5DayForecast = {}
 
 var apiKey = passApiKey;
 
-var func_updatePage = (args_apiData)=>{
-    //todo temp, wind, humidity, UV Index
-
-    var h1_cityName = $("<h1>").addClass("h1-city-name")
+var func_updateCityBoard = (argsStr_cityName, args_data)=>{
+   
+  var h1_cityName = $("<h1>").addClass("h1-city-name")
     h1_cityName.attr('id', 'h1-city-name')
-    h1_cityName.html(args_apiData.city["name"])
+    h1_cityName.html(argsStr_cityName)
     div_cityBoard.append(h1_cityName)
+
+    var today = moment().format("M/D/Y")
+    console.log(args_data)
+    var float_temp = "Temp: "+ args_data["main"]["temp"]
+    var str_wind = "Wind: " + args_data["weather"][0]["description"]
+    var int_humidity = "Humidity: "+ args_data["main"]["humidity"]
+    if(bool_dbg)console.log(`${today} | ${float_temp} | ${str_wind} | ${int_humidity}`)
 }
+
+
+var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
+    //todo temp, wind, humidity, UV Index
+    
+    div_weatherBoard.children().remove()
+    if(bool_dbg)console.log('in func_updateWeatherBoard')
+    
+
+    
+
+    //todo cloud icon
+    
+    var str_date = args_Obj5Day
+
+    function createLi(args_str){
+      var li = $("<li>").addClass("li-weather-card-item list-unstyled w-100 p-0")
+      return li.html(args_str)
+    }
+
+    var div_container = $("<div>").addClass("container")
+    var div_row = $("<div>").addClass("row")
+    
+    for(key in args_Obj5Day){
+      var div_weatherCard = $("<div>").addClass("card col")
+      var str_date = key;
+      var float_temp = "Temp: "+ args_Obj5Day[key]["main"]["temp"]
+      var str_wind = "Wind: " + args_Obj5Day[key]["weather"][0]["description"]
+      var int_humidity = "Humidity: "+ args_Obj5Day[key]["main"]["humidity"]
+      //console.log(args_Obj5Day[key]["main"]["humidity"])
+      
+      var ul = $("<ul>").addClass("w-100 p-0")
+      ul.append(createLi(str_date))
+      ul.append(createLi(float_temp))
+      ul.append(createLi(str_wind))
+      ul.append(createLi(int_humidity))
+      div_weatherCard.append(ul)
+      div_row.append(div_weatherCard)
+      div_container.append(div_row)
+      
+    }
+    div_weatherBoard.append(div_container)
+    
+    //console.log(createLi(str_date))
+    
+   
+    // todo humidity
+    
+
+   
+}
+
 
 
 var func_searchCity = (argStr_cityName)=>{
@@ -21,17 +81,20 @@ var func_searchCity = (argStr_cityName)=>{
   div_cityBoard.children().remove() 
   
   
-  var apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${argStr_cityName}&appid=${apiKey}`
-  if(bool_dbg) console.log(apiUrl)
-  var apiData = fetch(apiUrl) //make api call
+  var apiUrl = ''
+  apiUrl=`https://api.openweathermap.org/data/2.5/weather?q=${argStr_cityName}&appid=${apiKey}`
+  fetch(apiUrl) //make api call
   .then(function(response) {
     // 1st then waits to see if there is a valid response
 
     // request was successful
     if (response.ok) {
       response.json().then(function(data) {
-        console.log(data);
-        func_updatePage(data)
+        // ToDo code
+        //console.log(data.name)
+        func_updateCityBoard(data.name, data)
+        
+        
       });
     } else {
       alert('Error: city not found');
@@ -40,14 +103,59 @@ var func_searchCity = (argStr_cityName)=>{
   .catch(function(error) {
     // Notice this `.catch()` getting chained onto the end of the `.then()` method
     alert("Unable to connect to api");
-  });
+  });//end fetch
 
+
+
+
+
+
+  // ------- second api call below ------
+  apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${argStr_cityName}&appid=${apiKey}`
+  if(bool_dbg) console.log(apiUrl)
+  
+  fetch(apiUrl) //make api call
+  .then(function(response) {
+    // 1st then waits to see if there is a valid response
+
+    // request was successful
+    if (response.ok) {
+      response.json().then(function(data) {
+        if(bool_dbg)console.log("in  func_searchCity")
+        if(bool_dbg)console.log(data)
+        var obj_temp = data.list
+        
+        
+        obj_temp.forEach(element => {
+          
+        
+        var str_date =  moment(element.dt_txt).format("M/D/Y")
+        //console.log(str_date)
+        obj_5DayForecast[str_date] = element
+        
+          
+        });
+        if(bool_dbg)console.log("before exiting search")
+        
+        func_updateWeatherBoard(data.city.name, obj_5DayForecast)
+      });
+    } else {
+      alert('Error: city not found');
+    }
+  })
+  .catch(function(error) {
+    // Notice this `.catch()` getting chained onto the end of the `.then()` method
+    alert("Unable to connect to api");
+  });// end fetch
 
   
 
 
 
 }
+
+
+
 
 var func_addCityList = (argStr_cityName)=>{
     //add city to array
@@ -65,12 +173,15 @@ var func_addCityList = (argStr_cityName)=>{
     li_aCity.html(argStr_cityName)
     ul_cityList.append(li_aCity)
 
-    console.log(dictStr_cityList)
+    
     }
     
     // else city is on the list, so just search for it.
     //search city
     func_searchCity(argStr_cityName)
+    
+    
+    //func_searchCity(obj_coordinates)
     
 
 
