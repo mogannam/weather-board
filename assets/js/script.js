@@ -1,25 +1,29 @@
-var bool_dbg =true
+var bool_dbg =false
 var dictStr_cityList = {}
 var str_liCityCSS = "li-city"
 var div_cityBoard = $(".city-board")
 var div_weatherBoard = $(".weather-forecast-board")
 var obj_5DayForecast = {}
+var int_lat =0
+var int_lon = 0
+var apiUrl = ''
 
 var apiKey = passApiKey;
 
 var func_updateCityBoard = (argsStr_cityName, args_data)=>{
    
-  var h1_cityName = $("<h1>").addClass("h1-city-name")
+    var h1_cityName = $("<h1>").addClass("h1-city-name")
     h1_cityName.attr('id', 'h1-city-name')
     h1_cityName.html(argsStr_cityName)
     div_cityBoard.append(h1_cityName)
 
     var today = moment().format("M/D/Y")
     console.log(args_data)
-    var float_temp = "Temp: "+ args_data["main"]["temp"]
-    var str_wind = "Wind: " + args_data["weather"][0]["description"]
-    var int_humidity = "Humidity: "+ args_data["main"]["humidity"]
-    if(bool_dbg)console.log(`${today} | ${float_temp} | ${str_wind} | ${int_humidity}`)
+    var float_temp = "Temp: "+ args_data.current.temp
+    var str_wind = "Wind: " + args_data.current.weather[0].description
+    var int_humidity = "Humidity: "+ args_data.current.humidity
+    var uvi = "UVI:"+ args_data.current.uvi
+    console.log(`${today} | ${float_temp} | ${str_wind} | ${int_humidity} | ${uvi}`)
 }
 
 
@@ -73,16 +77,11 @@ var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
    
 }
 
-
-
-var func_searchCity = (argStr_cityName)=>{
+var func_getCurrentWeather = (args_lat, args_lon, argsStr_cityName)=>{
+  if(bool_dbg)console.log(`lat: ${args_lat} | Lon: ${args_lon}`)
   
-  // clear the board for a new city
-  div_cityBoard.children().remove() 
-  
-  
-  var apiUrl = ''
-  apiUrl=`https://api.openweathermap.org/data/2.5/weather?q=${argStr_cityName}&appid=${apiKey}`
+  //apiUrl=`https://api.openweathermap.org/data/2.5/weather?q=${argStr_cityName}&appid=${apiKey}`
+  apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${args_lat}&lon=${args_lon}&appid=${apiKey}`
   fetch(apiUrl) //make api call
   .then(function(response) {
     // 1st then waits to see if there is a valid response
@@ -91,8 +90,8 @@ var func_searchCity = (argStr_cityName)=>{
     if (response.ok) {
       response.json().then(function(data) {
         // ToDo code
-        //console.log(data.name)
-        func_updateCityBoard(data.name, data)
+        console.log(data)
+        func_updateCityBoard(argsStr_cityName, data)
         
         
       });
@@ -105,14 +104,18 @@ var func_searchCity = (argStr_cityName)=>{
     alert("Unable to connect to api");
   });//end fetch
 
+}
 
 
-
-
-
-  // ------- second api call below ------
+var func_searchCity = (argStr_cityName)=>{
+  
+  // clear the board for a new city
+  div_cityBoard.children().remove() 
+  
   apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${argStr_cityName}&appid=${apiKey}`
   if(bool_dbg) console.log(apiUrl)
+
+  
   
   fetch(apiUrl) //make api call
   .then(function(response) {
@@ -125,7 +128,11 @@ var func_searchCity = (argStr_cityName)=>{
         if(bool_dbg)console.log(data)
         var obj_temp = data.list
         
-        
+        int_lat = data.city.coord.lat
+        int_lon = data.city.coord.lon
+        console.log(data.city.name)
+        func_getCurrentWeather(int_lat,int_lon, data.city.name)
+
         obj_temp.forEach(element => {
           
         
