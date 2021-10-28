@@ -197,7 +197,11 @@ var func_addCityList = (argStr_cityName)=>{
     //if(bool_dbg)console.log(`in func_addCityList ${argStr_cityName}`)
     
     //if city is not in the list, add it to the list
-
+    
+    dictStr_cityList = JSON.parse(localStorage.getItem("dictStr_cityList"))
+    console.log(dictStr_cityList)
+    if(dictStr_cityList === null)
+      dictStr_cityList = {}
     if(dictStr_cityList[argStr_cityName] === undefined){
     var index = Object.keys(dictStr_cityList).length
     dictStr_cityList[argStr_cityName] =argStr_cityName;
@@ -207,6 +211,7 @@ var func_addCityList = (argStr_cityName)=>{
     li_aCity.attr('id', `li-city-${index}`)
     li_aCity.html(argStr_cityName)
     ul_cityList.append(li_aCity)
+    localStorage.setItem("dictStr_cityList", JSON.stringify(dictStr_cityList))
 
     
     }
@@ -218,9 +223,41 @@ var func_addCityList = (argStr_cityName)=>{
     
     //func_searchCity(obj_coordinates)
     
-
-
 }
+
+var func_loadCachedCityList = ()=>{
+  console.log("in load cached city")
+  dictStr_cityList = JSON.parse(localStorage.getItem("dictStr_cityList"))
+  var ul_cityList = $("#city-list").addClass("list-group")
+  var index = 0;
+  
+  var index = 0
+  if(dictStr_cityList != null){
+    
+    var keysArr = Object.keys(dictStr_cityList)
+    keysArr.forEach((element, key) => {
+      
+      
+      var li_aCity = $("<li>").addClass(str_liCityCSS)
+      li_aCity.attr('id', `li-city-${index}`)
+      li_aCity.html(element)
+      ul_cityList.append(li_aCity)
+      localStorage.setItem("dictStr_cityList", JSON.stringify(dictStr_cityList))
+      index++
+
+    });
+
+      
+      
+    
+        
+      
+      
+    
+  }
+}
+
+func_loadCachedCityList()
 
 $("aside").on("click", "li",()=>{
   index = $( event.target ).closest(".list-group-item").index();
@@ -235,3 +272,4 @@ $("#btn-search").on("click", ()=>{
     // todo if null search value, update search field with warning and don't search
     func_addCityList(str_cityName)
 })
+
