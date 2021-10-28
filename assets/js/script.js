@@ -1,6 +1,6 @@
 var bool_dbg =false
 var dictStr_cityList = {}
-var str_liCityCSS = "li-city"
+var str_liCityCSS = "li-city list-group-item"
 var div_cityBoard = $(".city-board")
 var div_weatherBoard = $(".weather-forecast-board")
 var obj_5DayForecast = {}
@@ -11,6 +11,11 @@ var apiUrl = ''
 var apiKey = passApiKey;
 
 var func_updateCityBoard = (argsStr_cityName, args_data)=>{
+
+  function createLi(args_str){
+    var li = $("<li>").addClass("li-weather-card-item list-unstyled w-100 p-0")
+    return li.html(args_str)
+  }
    
     var h1_cityName = $("<h1>").addClass("h1-city-name")
     h1_cityName.attr('id', 'h1-city-name')
@@ -22,9 +27,32 @@ var func_updateCityBoard = (argsStr_cityName, args_data)=>{
     var float_temp = "Temp: "+ args_data.current.temp
     var str_wind = "Wind: " + args_data.current.weather[0].description
     var int_humidity = "Humidity: "+ args_data.current.humidity
-    var uvi = "UVI:"+ args_data.current.uvi
+
+    var int_uvi = args_data.current.uvi
+    var str_uviCss = "bg-light"
+    if(int_uvi <= 2)
+      str_uviCss = "bg-success"
+    else if(int_uvi <=5)
+      str_uviCss = "bg-warning"
+    else if(int_uvi <=7)
+      str_uviCss = "bg-orange"
+    else if(int_uvi <=10)
+      str_uviCss = "bg-danger"
+    else
+      str_uviCss ="bg-purple"
+    var uvi = `UVI: <span class=\"uvi-index ${str_uviCss}\">`+ int_uvi+ "</span>"
+
+    var ul = $("<ul>").addClass("w-100 p-0")
+    ul.append(createLi(today))
+    ul.append(createLi(float_temp))
+    ul.append(createLi(str_wind))
+    ul.append(createLi(int_humidity))
+    ul.append(createLi(uvi))
+    div_cityBoard.append(ul)
+    
     console.log(`${today} | ${float_temp} | ${str_wind} | ${int_humidity} | ${uvi}`)
-}
+
+  }
 
 
 var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
@@ -171,9 +199,9 @@ var func_addCityList = (argStr_cityName)=>{
     //if city is not in the list, add it to the list
 
     if(dictStr_cityList[argStr_cityName] === undefined){
-    var index = dictStr_cityList.length
+    var index = Object.keys(dictStr_cityList).length
     dictStr_cityList[argStr_cityName] =argStr_cityName;
-    var ul_cityList = $("#city-list")
+    var ul_cityList = $("#city-list").addClass("list-group")
     
     var li_aCity = $("<li>").addClass(str_liCityCSS)
     li_aCity.attr('id', `li-city-${index}`)
@@ -193,6 +221,13 @@ var func_addCityList = (argStr_cityName)=>{
 
 
 }
+
+$("aside").on("click", "li",()=>{
+  index = $( event.target ).closest(".list-group-item").index();
+  var str_cityName = $(`#li-city-${index}`).html()
+  func_searchCity(str_cityName)
+
+})
 
 $("#btn-search").on("click", ()=>{
     var str_cityName = $("#city-name").val()
