@@ -1,4 +1,4 @@
-var bool_dbg =true
+var bool_dbg =false
 var dictStr_cityList = {}
 var str_liCityCSS = "li-city list-group-item"
 var div_cityBoard = $(".city-board")
@@ -19,17 +19,20 @@ var func_updateCityBoard = (argsStr_cityName, args_data)=>{
     var li = $("<li>").addClass("li-weather-card-item list-unstyled w-100 p-0")
     return li.html(args_str)
   }
-   
+  
+    var today = moment().format("M/D/Y")
+
     var h1_cityName = $("<h1>").addClass("h1-city-name")
     h1_cityName.attr('id', 'h1-city-name')
-    h1_cityName.html(argsStr_cityName)
-    div_cityBoard.append(h1_cityName)
-
-    var today = moment().format("M/D/Y")
-    console.log("line 26 ")
-    console.log(args_data)
+    h1_cityName.html(`${argsStr_cityName}(${today})`)
+    
+    var float_windSpeed = args_data.current.wind_speed
+    
+    
     var float_temp = "Temp: "+ args_data.current.temp + "&#8457;"
-    var str_wind = "Wind: " + args_data.current.weather[0].main
+    var str_wind = "Wind: " + float_windSpeed+" MPH"
+    var str_wind2 = args_data.current.weather[0].main
+    var str_imgUrl = `http://openweathermap.org/img/wn/${func_getWindUrl(str_wind2)}d@2x.png`;
     var int_humidity = "Humidity: "+ args_data.current.humidity
 
     var int_uvi = args_data.current.uvi
@@ -47,47 +50,55 @@ var func_updateCityBoard = (argsStr_cityName, args_data)=>{
     var uvi = `UVI: <span class=\"uvi-index ${str_uviCss}\">`+ int_uvi+ "</span>"
 
     var ul = $("<ul>").addClass("w-100 p-0")
-    ul.append(createLi(today))
+    //ul.append(createLi(today))
+
+    var li_image = createLi("")
+    var img = $("<img>").addClass("img-cityboard")
+    img.attr('src', str_imgUrl)
+    li_image.append(img)
+    h1_cityName.append(li_image)
+    div_cityBoard.append(h1_cityName)
+
     ul.append(createLi(float_temp))
     ul.append(createLi(str_wind))
     ul.append(createLi(int_humidity))
     ul.append(createLi(uvi))
     div_cityBoard.append(ul)
     
-    console.log(`${today} | ${float_temp} | ${str_wind} | ${int_humidity} | ${uvi}`)
-
+   
   }
 var func_getWindUrl = (argsStr_wind)=>{
   
-  // "few clouds" : ,
-  //   
-  //   "broken clouds" : "04",
-  //   ,
-  //   ,
-  //   ,
-  //   ,
-  //   
-
-  switch(argsStr_wind){
-    case "clear sky":
-      return "01"
-    case "few clouds":
-      return "02"
-    case "scattered clouds": 
-      return "03"
-    case "shower rain":
-      return "09"
-    case "rain": 
-      return"10"
-    case "thunderstorm":
-      return "11"
-    case "snow":
-      return"13"
-    case "mist":
-      return "50"
-    default:
-        return "04"
+  var Str_return = "10" // Rain
+  if(argsStr_wind ==="Clear"){
+    Str_return = "01"
   }
+  else if (argsStr_wind === "Clouds"){
+    Str_return = "02"
+  }
+  else if(argsStr_wind === "scattered clouds"){
+    Str_return = "03"
+  }
+  else if(argsStr_wind === "shower rain"){
+    Str_return = "09"
+  }
+  else if(argsStr_wind === "Rain"){
+    Str_return = "10"
+  }
+  else if(argsStr_wind === "thunderstorm"){
+    Str_return = "11"
+  }
+  else if(argsStr_wind === "snow"){
+    Str_return ="13"
+  }
+  else if(argsStr_wind ==="mist"){
+    Str_return = "50"
+  }
+  else{ // clouds
+    Str_return = "04"
+  }
+
+  return Str_return
 
 
 }
@@ -96,11 +107,7 @@ var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
     //todo temp, wind, humidity, UV Index
     
     div_weatherBoard.children().remove()
-    if(bool_dbg)console.log('in func_updateWeatherBoard')
-    
-
-    
-
+  
     //todo cloud icon
     
     var str_date = args_Obj5Day
@@ -117,13 +124,23 @@ var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
       var div_weatherCard = $("<div>").addClass("card col")
       var str_date = key;
       var float_temp = "Temp: "+ args_Obj5Day[key]["main"]["temp"] + "&#8457;"
-      var str_wind = "Wind: " + args_Obj5Day[key]["weather"][0]["main"]
-      var str_windUrl = `http://openweathermap.org/img/wn/${func_getWindUrl(str_wind)}d@2x.png`;
+
+      var float_windSpeed = args_Obj5Day[key].wind.speed
+      
+      var str_wind = "Wind: " + float_windSpeed+" MPH"
+      
+      var str_wind2 = args_Obj5Day[key]["weather"][0]["main"]
+      var str_imgUrl = `http://openweathermap.org/img/wn/${func_getWindUrl(str_wind2)}d@2x.png`;
       var int_humidity = "Humidity: "+ args_Obj5Day[key]["main"]["humidity"]
-      //console.log(args_Obj5Day[key]["main"]["humidity"])
       
       var ul = $("<ul>").addClass("w-100 p-0")
       ul.append(createLi(str_date))
+      var li_image = createLi("")
+      var img = $("<img>").addClass("img-weatherboard")
+      img.attr('src', str_imgUrl)
+      li_image.append(img)
+      ul.append(li_image)
+      
       ul.append(createLi(float_temp))
       ul.append(createLi(str_wind))
       ul.append(createLi(int_humidity))
@@ -134,17 +151,11 @@ var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
     }
     div_weatherBoard.append(div_container)
     
-    //console.log(createLi(str_date))
-    
-   
-    // todo humidity
-    
 
    
 }
 
 var func_getCurrentWeather = (args_lat, args_lon, argsStr_cityName)=>{
-  if(bool_dbg)console.log(`lat: ${args_lat} | Lon: ${args_lon}`)
   
   //apiUrl=`https://api.openweathermap.org/data/2.5/weather?q=${argStr_cityName}&appid=${apiKey}`
   apiUrl = `https://api.openweathermap.org/data/2.5/onecall?units=${str_weatherUnit}&lat=${args_lat}&lon=${args_lon}&appid=${apiKey}`
@@ -156,7 +167,7 @@ var func_getCurrentWeather = (args_lat, args_lon, argsStr_cityName)=>{
     if (response.ok) {
       response.json().then(function(data) {
         // ToDo code
-        console.log(data)
+        
         func_updateCityBoard(argsStr_cityName, data)
         
         
@@ -173,13 +184,44 @@ var func_getCurrentWeather = (args_lat, args_lon, argsStr_cityName)=>{
 }
 
 
+var func_addCityList = (argStr_cityName)=>{
+  //add city to array
+ 
+  //if city is not in the list, add it to the list
+  
+  dictStr_cityList = JSON.parse(localStorage.getItem("dictStr_cityList"))
+  
+  if(dictStr_cityList === null)
+    dictStr_cityList = {}
+  if(dictStr_cityList[argStr_cityName] === undefined){
+  var index = Object.keys(dictStr_cityList).length
+  dictStr_cityList[argStr_cityName] =argStr_cityName;
+  var ul_cityList = $("#city-list").addClass("list-group")
+  
+  var li_aCity = $("<li>").addClass(str_liCityCSS)
+  li_aCity.attr('id', `li-city-${index}`)
+  li_aCity.html(argStr_cityName)
+  ul_cityList.append(li_aCity)
+  localStorage.setItem("dictStr_cityList", JSON.stringify(dictStr_cityList))
+
+  
+  }
+  
+  // else city is on the list, so just search for it.
+  //search city
+  //func_searchCity(argStr_cityName)
+  
+  
+  //func_searchCity(obj_coordinates)
+  
+}
+
 var func_searchCity = (argStr_cityName)=>{
   
   // clear the board for a new city
   div_cityBoard.children().remove() 
   
   apiUrl = `https://api.openweathermap.org/data/2.5/forecast?units=${str_weatherUnit}&q=${argStr_cityName}&appid=${apiKey}`
-  if(bool_dbg) console.log(apiUrl)
   
   
   fetch(apiUrl) //make api call
@@ -189,81 +231,51 @@ var func_searchCity = (argStr_cityName)=>{
     // request was successful
     if (response.ok) {
       response.json().then(function(data) {
-        if(bool_dbg)console.log("in  func_searchCity")
-        if(bool_dbg)console.log(data)
+        
+        func_addCityList(argStr_cityName)
         var obj_temp = data.list
         
         int_lat = data.city.coord.lat
         int_lon = data.city.coord.lon
-        console.log(data.city.name)
+        
         func_getCurrentWeather(int_lat,int_lon, data.city.name)
 
         obj_temp.forEach(element => {
           
         
         var str_date =  moment(element.dt_txt).format("M/D/Y")
-        //console.log(str_date)
+        
         obj_5DayForecast[str_date] = element
         
           
         });
-        if(bool_dbg)console.log("before exiting search")
+        
         
         func_updateWeatherBoard(data.city.name, obj_5DayForecast)
+        
       });
     } else {
       alert('Error: city not found');
+      
     }
+    
   })
   .catch(function(error) {
     // Notice this `.catch()` getting chained onto the end of the `.then()` method
     alert("Unable to connect to api");
+    
   });// end fetch
 
-  
-
-
 
 }
 
 
 
 
-var func_addCityList = (argStr_cityName)=>{
-    //add city to array
-    //if(bool_dbg)console.log(`in func_addCityList ${argStr_cityName}`)
-    
-    //if city is not in the list, add it to the list
-    
-    dictStr_cityList = JSON.parse(localStorage.getItem("dictStr_cityList"))
-    console.log(dictStr_cityList)
-    if(dictStr_cityList === null)
-      dictStr_cityList = {}
-    if(dictStr_cityList[argStr_cityName] === undefined){
-    var index = Object.keys(dictStr_cityList).length
-    dictStr_cityList[argStr_cityName] =argStr_cityName;
-    var ul_cityList = $("#city-list").addClass("list-group")
-    
-    var li_aCity = $("<li>").addClass(str_liCityCSS)
-    li_aCity.attr('id', `li-city-${index}`)
-    li_aCity.html(argStr_cityName)
-    ul_cityList.append(li_aCity)
-    localStorage.setItem("dictStr_cityList", JSON.stringify(dictStr_cityList))
 
-    
-    }
-    
-    // else city is on the list, so just search for it.
-    //search city
-    func_searchCity(argStr_cityName)
-    
-    
-    //func_searchCity(obj_coordinates)
-    
-}
 
 var func_loadCachedCityList = ()=>{
-  console.log("in load cached city")
+  
   dictStr_cityList = JSON.parse(localStorage.getItem("dictStr_cityList"))
   var ul_cityList = $("#city-list").addClass("list-group")
   var index = 0;
@@ -305,8 +317,9 @@ $("aside").on("click", "li",()=>{
 
 $("#btn-search").on("click", ()=>{
     var str_cityName = $("#city-name").val()
-    if(bool_dbg)console.log(`city ${str_cityName}`)
+    
     // todo if null search value, update search field with warning and don't search
-    func_addCityList(str_cityName)
+    var bool_validCity = func_searchCity(str_cityName)
+    //func_addCityList(str_cityName)
 })
 
