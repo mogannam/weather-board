@@ -1,4 +1,4 @@
-var bool_dbg =false
+var bool_dbg =true
 var dictStr_cityList = {}
 var str_liCityCSS = "li-city list-group-item"
 var div_cityBoard = $(".city-board")
@@ -7,8 +7,11 @@ var obj_5DayForecast = {}
 var int_lat =0
 var int_lon = 0
 var apiUrl = ''
+var str_weatherUnit = "imperial"
 
 var apiKey = passApiKey;
+
+var func_resetForm = ()=>{}
 
 var func_updateCityBoard = (argsStr_cityName, args_data)=>{
 
@@ -23,9 +26,10 @@ var func_updateCityBoard = (argsStr_cityName, args_data)=>{
     div_cityBoard.append(h1_cityName)
 
     var today = moment().format("M/D/Y")
+    console.log("line 26 ")
     console.log(args_data)
-    var float_temp = "Temp: "+ args_data.current.temp
-    var str_wind = "Wind: " + args_data.current.weather[0].description
+    var float_temp = "Temp: "+ args_data.current.temp + "&#8457;"
+    var str_wind = "Wind: " + args_data.current.weather[0].main
     var int_humidity = "Humidity: "+ args_data.current.humidity
 
     var int_uvi = args_data.current.uvi
@@ -53,7 +57,40 @@ var func_updateCityBoard = (argsStr_cityName, args_data)=>{
     console.log(`${today} | ${float_temp} | ${str_wind} | ${int_humidity} | ${uvi}`)
 
   }
+var func_getWindUrl = (argsStr_wind)=>{
+  
+  // "few clouds" : ,
+  //   
+  //   "broken clouds" : "04",
+  //   ,
+  //   ,
+  //   ,
+  //   ,
+  //   
 
+  switch(argsStr_wind){
+    case "clear sky":
+      return "01"
+    case "few clouds":
+      return "02"
+    case "scattered clouds": 
+      return "03"
+    case "shower rain":
+      return "09"
+    case "rain": 
+      return"10"
+    case "thunderstorm":
+      return "11"
+    case "snow":
+      return"13"
+    case "mist":
+      return "50"
+    default:
+        return "04"
+  }
+
+
+}
 
 var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
     //todo temp, wind, humidity, UV Index
@@ -79,8 +116,9 @@ var func_updateWeatherBoard = (argStr_cityName, args_Obj5Day)=>{
     for(key in args_Obj5Day){
       var div_weatherCard = $("<div>").addClass("card col")
       var str_date = key;
-      var float_temp = "Temp: "+ args_Obj5Day[key]["main"]["temp"]
-      var str_wind = "Wind: " + args_Obj5Day[key]["weather"][0]["description"]
+      var float_temp = "Temp: "+ args_Obj5Day[key]["main"]["temp"] + "&#8457;"
+      var str_wind = "Wind: " + args_Obj5Day[key]["weather"][0]["main"]
+      var str_windUrl = `http://openweathermap.org/img/wn/${func_getWindUrl(str_wind)}d@2x.png`;
       var int_humidity = "Humidity: "+ args_Obj5Day[key]["main"]["humidity"]
       //console.log(args_Obj5Day[key]["main"]["humidity"])
       
@@ -109,7 +147,7 @@ var func_getCurrentWeather = (args_lat, args_lon, argsStr_cityName)=>{
   if(bool_dbg)console.log(`lat: ${args_lat} | Lon: ${args_lon}`)
   
   //apiUrl=`https://api.openweathermap.org/data/2.5/weather?q=${argStr_cityName}&appid=${apiKey}`
-  apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${args_lat}&lon=${args_lon}&appid=${apiKey}`
+  apiUrl = `https://api.openweathermap.org/data/2.5/onecall?units=${str_weatherUnit}&lat=${args_lat}&lon=${args_lon}&appid=${apiKey}`
   fetch(apiUrl) //make api call
   .then(function(response) {
     // 1st then waits to see if there is a valid response
@@ -140,9 +178,8 @@ var func_searchCity = (argStr_cityName)=>{
   // clear the board for a new city
   div_cityBoard.children().remove() 
   
-  apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${argStr_cityName}&appid=${apiKey}`
+  apiUrl = `https://api.openweathermap.org/data/2.5/forecast?units=${str_weatherUnit}&q=${argStr_cityName}&appid=${apiKey}`
   if(bool_dbg) console.log(apiUrl)
-
   
   
   fetch(apiUrl) //make api call

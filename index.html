@@ -16,10 +16,12 @@
         <div class="row">
             <aside class="left-search-menu col-3 w-100" style="border: solid blue;"> 
                 
-                    
+            <form action="javascript:func_resetForm()"> 
             <label class="w-100 ">Search for a City: </label>
             <input type="text" class="search city-name w-100" id="city-name" aria-describedby="emailHelp" placeholder="Enter city">
-            <button  class="btn-search btn btn-primary w-100" id="btn-search">Submit</button>
+            <button type="reset" class="btn-search btn btn-primary w-100" id="btn-search">Submit</button>
+            </form> 
+
             <ul class="city-list" id="city-list">
 
             </ul>
