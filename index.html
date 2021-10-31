@@ -9,28 +9,29 @@
 </head>
 <body>
     <header class="jumbotron">
-        <h1 class="display-3">Weather Dashboard</h1>
+        <h1 class="display-3 text-center">Weather Dashboard</h1>
       </header>
 
-    <div class="container h-100" style="border: solid;">
+    <div class="container h-100 " id="body-container">
         <div class="row">
-            <aside class="left-search-menu col-3 w-100" style="border: solid blue;"> 
+            <aside class="left-search-menu col-3 w-100" > 
                 
             <form action="javascript:func_resetForm()"> 
-            <label class="w-100 ">Search for a City: </label>
+            <label class="w-100 "><h4>Search for a City: </h4></label>
             <input type="text" class="search city-name w-100" id="city-name" aria-describedby="emailHelp" placeholder="Enter city">
             <button type="reset" class="btn-search btn btn-primary w-100" id="btn-search">Submit</button>
             </form> 
 
+            <hr>
             <ul class="city-list" id="city-list">
 
             </ul>
             
             </aside>
             
-            <div class="col-9 " style="border: dashed red;">
-                <div class="city-board">top</div>
-                <div class="weather-forecast-board"> bottom</div>
+            <div class="col-9 " >
+                <div class="city-board" ></div>
+                <div class="weather-forecast-board"> </div>
             
             </div>
         </div>

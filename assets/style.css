@@ -5,3 +5,40 @@
 .bg-purple{
     background-color: purple!important;
 }
+.bg-gray{
+    background-color: lightgray;
+}
+
+.jumbotron{
+    background-color: #08399c;
+    color: white;
+}
+
+
+button{
+    margin-top: 10px;
+}
+
+.container{
+    margin-top: 10px;
+}
+
+.card{
+    color: white;
+    background-color: #336699;
+    margin: 2px;
+    padding: 2px;
+    text-align: center;
+}
+
+.city-list{
+    text-align: center;
+}
+
+.li{
+    margin: 5px;
+    
+}
+ul{
+    padding: 0px;
+}
