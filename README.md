@@ -17,7 +17,7 @@
 
 <a href="https://github.com/mogannam/weather-board.git"> Code on Github</a>
 
-<a href="https://github.com/mogannam/weather-board/settings/pages"> Demo the Deployed Project</a>
+<a href="https://mogannam.github.io/weather-board/"> Demo the Deployed Project</a>
 
 <p>Clone the projecct here: <em>git@github.com:mogannam/weather-board.git</em></p>
 	
