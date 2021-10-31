@@ -34,7 +34,7 @@ Project is created with:
 Just open the index.html file in a web browser. This is just a simple html website that dynamically updates via Java Script.
 
 ## Mockup
-<img src="https://raw.githubusercontent.com/mogannam/time-keeper/main/time-keeper-mockup.png">
+<img src="https://raw.githubusercontent.com/mogannam/time-keeper/main/Weather Dashboard.gif">
 
 
 ## Resources
